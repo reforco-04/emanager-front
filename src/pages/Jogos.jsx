@@ -1,9 +1,11 @@
-import { Button, Drawer, Form, Input, Popconfirm, Select, Table, Tag } from "antd";
+import { Button, Drawer, Form, Image, Input, Popconfirm, Select, Table, Tag, Upload } from "antd";
 import { useBuscarJogo, useCriarJogo, useDeletarJogo, useEditarJogo } from "../hooks/jogosHooks";
 import { BiPencil, BiTrash } from "react-icons/bi";
 import { useContext, useState } from "react";
 import { AntContext } from "../contexts/AntProvider";
 import { useBuscarPlataforma } from "../hooks/plataformasHooks";
+import { LuPlus } from "react-icons/lu";
+
 
 const Jogos = () => {
 
@@ -84,6 +86,16 @@ const Jogos = () => {
                     className="w-[50px]"
                 />
                 <Table.Column
+                title={"Capa"}
+                render={(_, linha) => (
+                    <Image
+                    width={60}
+                        src={linha.imagem}
+                        alt={linha.nome}
+                    />
+                )}
+                />
+                <Table.Column
                     key={"nome"}
                     dataIndex={"nome"}
                     title={"Nome"}
@@ -105,14 +117,17 @@ const Jogos = () => {
                 <Table.Column
                     title={"Ações"}
                     className="w-[100px]"
-                    render={(_, nivel) => (
+                    render={(_, linha) => (
                         <div className="flex gap-3">
                             <BiPencil
                                 size={18}
                                 onClick={() => {
                                     formEditar.setFieldsValue({
-                                        id: nivel.id,
-                                        nome: nivel.nome
+                                        id: linha.id,
+                                        nome: linha.nome,
+                                        plataforma_id: linha.plataformas.id,
+                                        preco_full: linha.preco_full,
+                                        preco_promo: linha.preco_promo,
                                     });
                                     setVerEditar(true);
                                 }}
@@ -140,6 +155,7 @@ const Jogos = () => {
                     layout="vertical"
                     onFinish={criar}
                     form={formCriar}
+                    encType="multipart/form-data"
                 >
                     <Form.Item
                         label={"Nome"}
@@ -179,6 +195,22 @@ const Jogos = () => {
                             <Input />
                         </Form.Item>
                     </div>
+                    <Form.Item
+                        name="imagem"
+                        label="Capa"
+                        valuePropName="file"
+                        getValueFromEvent={(e) => e.file}
+                        rules={[{ required: true, message: "Campo Obrigatório" }]}
+                    >
+                        <Upload
+                            listType="picture-card"
+                            beforeUpload={() => false}
+                            accept="image/*"
+
+                        >
+                            <LuPlus />
+                        </Upload>
+                    </Form.Item>
                     <Button loading={criarPending} htmlType="submit" type="primary">Criar</Button>
                 </Form>
             </Drawer>
@@ -192,6 +224,7 @@ const Jogos = () => {
                     layout="vertical"
                     onFinish={editar}
                     form={formEditar}
+                    encType="multipart/form-data"
                 >
                     <Form.Item
                         hidden
@@ -205,6 +238,53 @@ const Jogos = () => {
                         rules={[{ required: true, message: "Campo obrigatório" }]}
                     >
                         <Input />
+                    </Form.Item>
+                    <Form.Item
+                        label={"Plataforma"}
+                        name={"plataforma_id"}
+                        rules={[{ required: true, message: "Campo obrigatório" }]}
+                    >
+                        <Select
+                            placeholder="Escolha a plataforma"
+                            options={(plataformas || []).map(plataforma => {
+                                return {
+                                    label: plataforma.nome,
+                                    value: plataforma.id
+                                }
+                            })}
+                        />
+                    </Form.Item>
+                    <div className="flex gap-4 *:flex-1">
+                        <Form.Item
+                            label={"Preço cheio"}
+                            name={"preco_full"}
+                            rules={[{ required: true, message: "Campo obrigatório" }]}
+                        >
+                            <Input />
+                        </Form.Item>
+                        <Form.Item
+                            label={"Preço promocional"}
+                            name={"preco_promo"}
+                            rules={[{ required: true, message: "Campo obrigatório" }]}
+                        >
+                            <Input />
+                        </Form.Item>
+                    </div>
+                    <Form.Item
+                        name="imagem"
+                        label="Capa"
+                        valuePropName="file"
+                        getValueFromEvent={(e) => e.file}
+
+                    >
+                        <Upload
+                            listType="picture-card"
+                            beforeUpload={() => false}
+                            accept="image/*"
+
+                        >
+                            <LuPlus />
+                        </Upload>
                     </Form.Item>
 
                     <Button loading={editarPending} htmlType="submit" type="primary">Editar</Button>

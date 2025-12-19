@@ -14,7 +14,11 @@ export const useBuscarJogo = () => {
 export const useCriarJogo = () => {
     return useMutation({
         mutationFn: async (dados) => {
-            const response = await API.post("/jogos", dados);
+            const response = await API.post("/jogos", dados, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
             return response.data;
         },
         onSuccess: () => {
@@ -28,7 +32,11 @@ export const useCriarJogo = () => {
 export const useEditarJogo = () => {
     return useMutation({
         mutationFn: async (dados) => {
-            const response = await API.put(`/jogos/${dados.id}`, dados);
+            const response = await API.put(`/jogos/${dados.id}`, dados, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
             return response.data;
         },
         onSuccess: () => {
